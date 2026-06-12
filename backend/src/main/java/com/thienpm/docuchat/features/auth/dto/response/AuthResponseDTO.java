@@ -1,0 +1,10 @@
+package com.thienpm.docuchat.features.auth.dto.response;
+
+public record AuthResponseDTO(
+        String accessToken,
+        String refreshToken) {
+
+    public static AuthResponseDTO of(String accessToken, String refreshToken) {
+        return new AuthResponseDTO(accessToken, refreshToken);
+    }
+}
