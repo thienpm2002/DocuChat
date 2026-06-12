@@ -1,13 +1,11 @@
-import { Button } from "@/components/ui/button";
+import { RouterProvider } from "react-router-dom"
+import { router } from "./routes/index.jsx"
 
 function App() {
   return (
-    <div className="text-3xl font-bold underline">
-      Hello
-      <Button>
-      Hello Askify
-    </Button>
-    </div>
+    <>
+      <RouterProvider router={router} />
+    </>
   )
 }
 
