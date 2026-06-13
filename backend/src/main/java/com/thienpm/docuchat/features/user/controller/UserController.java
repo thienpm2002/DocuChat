@@ -3,7 +3,7 @@ package com.thienpm.docuchat.features.user.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thienpm.docuchat.features.user.dto.response.UserDetailsDTO;
+import com.thienpm.docuchat.features.user.dto.response.UserDetailsResponse;
 import com.thienpm.docuchat.features.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserDetailsDTO> getProfile(@AuthenticationPrincipal Long userId) {
+    public ResponseEntity<UserDetailsResponse> getProfile(@AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok().body(userService.getProfile(userId));
     }
 

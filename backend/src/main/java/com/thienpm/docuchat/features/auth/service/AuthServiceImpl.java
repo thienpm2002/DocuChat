@@ -6,8 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.thienpm.docuchat.common.exception.AppException;
 import com.thienpm.docuchat.common.exception.ErrorCode;
-import com.thienpm.docuchat.features.auth.dto.request.SignUpRequestDTO;
-import com.thienpm.docuchat.features.auth.dto.response.AuthResponseDTO;
+import com.thienpm.docuchat.features.auth.dto.request.SignUpRequest;
+import com.thienpm.docuchat.features.auth.dto.response.AuthResponse;
+import com.thienpm.docuchat.features.user.dto.response.UserDetailsResponse;
 import com.thienpm.docuchat.features.user.entity.User;
 import com.thienpm.docuchat.features.user.enums.Role;
 import com.thienpm.docuchat.features.user.repository.UserRepository;
@@ -24,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
 
     @Override
-    public AuthResponseDTO signUp(SignUpRequestDTO signUpRequest) {
+    public AuthResponse signUp(SignUpRequest signUpRequest) {
 
         if (userRepository.existsByEmail(signUpRequest.email())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -41,19 +42,39 @@ public class AuthServiceImpl implements AuthService {
 
         UserDetails userDetails = new CustomUserDetails(newUser);
 
-        return AuthResponseDTO.of(jwtService.generateAccessToken(userDetails),
-                jwtService.generateRefreshToken(userDetails));
+        return AuthResponse.of(
+                jwtService.generateAccessToken(userDetails),
+
+                jwtService.generateRefreshToken(userDetails),
+
+                new UserDetailsResponse(
+                        newUser.getId(),
+                        newUser.getUsername(),
+                        newUser.getEmail(),
+                        newUser.getAvatarUrl(),
+                        newUser.getRole()));
 
     }
 
     @Override
-    public AuthResponseDTO generateTokens(UserDetails userDetails) {
-        return AuthResponseDTO.of(jwtService.generateAccessToken(userDetails),
-                jwtService.generateRefreshToken(userDetails));
+    public AuthResponse generateTokens(UserDetails userDetails) {
+        User user = ((CustomUserDetails) userDetails).getUser();
+
+        return AuthResponse.of(
+                jwtService.generateAccessToken(userDetails),
+
+                jwtService.generateRefreshToken(userDetails),
+
+                new UserDetailsResponse(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getAvatarUrl(),
+                        user.getRole()));
     }
 
     @Override
-    public AuthResponseDTO refresh(String refreshToken) {
+    public AuthResponse refresh(String refreshToken) {
         if (refreshToken == null)
             throw new AppException(ErrorCode.UNAUTHORIZED);
 

@@ -2,9 +2,9 @@ package com.thienpm.docuchat.features.auth.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thienpm.docuchat.features.auth.dto.request.LoginRequestDTO;
-import com.thienpm.docuchat.features.auth.dto.request.SignUpRequestDTO;
-import com.thienpm.docuchat.features.auth.dto.response.AuthResponseDTO;
+import com.thienpm.docuchat.features.auth.dto.request.LoginRequest;
+import com.thienpm.docuchat.features.auth.dto.request.SignUpRequest;
+import com.thienpm.docuchat.features.auth.dto.response.AuthResponse;
 import com.thienpm.docuchat.features.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -34,19 +34,21 @@ public class AuthController {
         private static final long REFRESH_COOKIE_AGE = 7 * 24 * 60 * 60;
 
         @PostMapping("/sign-up")
-        public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequestDTO request) {
+        public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request) {
 
-                AuthResponseDTO tokens = authService.signUp(request);
+                AuthResponse authResponse = authService.signUp(request);
 
-                ResponseCookie refreshCookie = setCookie(tokens.refreshToken());
+                ResponseCookie refreshCookie = setCookie(authResponse.refreshToken());
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                                .body(Map.of("accessToken", tokens.accessToken()));
+                                .body(Map.of(
+                                                "accessToken", authResponse.accessToken(),
+                                                "user", authResponse.userDetailsResponse()));
         }
 
         @PostMapping("/login")
-        public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
+        public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
 
                 Authentication authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
@@ -55,13 +57,15 @@ public class AuthController {
 
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-                AuthResponseDTO tokens = authService.generateTokens(userDetails);
+                AuthResponse authResponse = authService.generateTokens(userDetails);
 
-                ResponseCookie refreshCookie = setCookie(tokens.refreshToken());
+                ResponseCookie refreshCookie = setCookie(authResponse.refreshToken());
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                                .body(Map.of("accessToken", tokens.accessToken()));
+                                .body(Map.of(
+                                                "accessToken", authResponse.accessToken(),
+                                                "user", authResponse.userDetailsResponse()));
         }
 
         @PostMapping("/logout")
@@ -77,13 +81,15 @@ public class AuthController {
         @PostMapping("/refresh")
         public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
 
-                AuthResponseDTO tokens = authService.refresh(refreshToken);
+                AuthResponse authResponse = authService.refresh(refreshToken);
 
-                ResponseCookie refreshCookie = setCookie(tokens.refreshToken());
+                ResponseCookie refreshCookie = setCookie(authResponse.refreshToken());
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                                .body(Map.of("accessToken", tokens.accessToken()));
+                                .body(Map.of(
+                                                "accessToken", authResponse.accessToken(),
+                                                "user", authResponse.userDetailsResponse()));
         }
 
         private ResponseCookie setCookie(String refreshToken) {

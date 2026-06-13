@@ -2,13 +2,13 @@ package com.thienpm.docuchat.features.auth.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.thienpm.docuchat.features.auth.dto.request.SignUpRequestDTO;
-import com.thienpm.docuchat.features.auth.dto.response.AuthResponseDTO;
+import com.thienpm.docuchat.features.auth.dto.request.SignUpRequest;
+import com.thienpm.docuchat.features.auth.dto.response.AuthResponse;
 
 public interface AuthService {
-    AuthResponseDTO signUp(SignUpRequestDTO signUpRequest);
+    AuthResponse signUp(SignUpRequest signUpRequest);
 
-    AuthResponseDTO generateTokens(UserDetails userDetails);
+    AuthResponse generateTokens(UserDetails userDetails);
 
-    AuthResponseDTO refresh(String refreshToken);
+    AuthResponse refresh(String refreshToken);
 }
