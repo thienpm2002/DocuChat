@@ -15,6 +15,8 @@ import com.thienpm.docuchat.features.user.repository.UserRepository;
 import com.thienpm.docuchat.security.custom.CustomUserDetails;
 import com.thienpm.docuchat.security.jwt.JwtService;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -78,13 +80,19 @@ public class AuthServiceImpl implements AuthService {
         if (refreshToken == null)
             throw new AppException(ErrorCode.UNAUTHORIZED);
 
-        Long userId = Long.valueOf(jwtService.verifyRefreshToken(refreshToken).getSubject());
+        try {
+            Long userId = Long.valueOf(jwtService.verifyRefreshToken(refreshToken).getSubject());
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+            User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
 
-        UserDetails userDetails = new CustomUserDetails(user);
+            UserDetails userDetails = new CustomUserDetails(user);
 
-        return generateTokens(userDetails);
+            return generateTokens(userDetails);
+        } catch (ExpiredJwtException e) {
+            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+        } catch (JwtException e) {
+            throw new AppException(ErrorCode.TOKEN_INVALID);
+        }
     }
 
 }
