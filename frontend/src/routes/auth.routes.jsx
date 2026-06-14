@@ -1,6 +1,7 @@
 import AuthLayout from "@/features/auth/layouts/AuthLayout";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import SignUpPage from "@/features/auth/pages/SignUpPage";
+import PublicRoute from "@/features/auth/components/PublicRoute";
 
 export const authRoutes = {
   path: "/auth",
@@ -8,11 +9,19 @@ export const authRoutes = {
   children: [
     {
       path: "login",
-      element: <LoginPage />,
+      element: (
+        <PublicRoute>
+          <LoginPage />
+        </PublicRoute>
+      ),
     },
     {
       path: "sign-up",
-      element: <SignUpPage />,
+      element: (
+        <PublicRoute>
+          <SignUpPage />
+        </PublicRoute>
+      ),
     },
   ],
 };
