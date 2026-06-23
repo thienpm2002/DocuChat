@@ -44,12 +44,6 @@ public class DocumentController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DocumentResponse> getDocumentById(@PathVariable Long id,
-            @AuthenticationPrincipal Long userId) {
-        return ResponseEntity.ok().body(documentService.getDocumentById(id, userId));
-    }
-
     @GetMapping("/{id}/preview")
     public ResponseEntity<Resource> previewDocument(
             @PathVariable Long id,

@@ -11,8 +11,6 @@ import org.springframework.core.io.Resource;
 public interface DocumentService {
     DocumentResponse uploadDocument(MultipartFile file, Long userId);
 
-    DocumentResponse getDocumentById(Long documentId, Long userId);
-
     PaginationResponse<DocumentResponse> getAllDocuments(PaginationRequest request, Long userId);
 
     RetryDocumentResponse retryProcess(Long userId, Long documentId);

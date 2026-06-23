@@ -5,10 +5,11 @@ import java.time.LocalDateTime;
 import com.thienpm.docuchat.common.enums.DocumentStatus;
 
 public record DocumentResponse(
-        Long id,
-        String originalName,
-        Long fileSize,
-        DocumentStatus status,
-        LocalDateTime createdAt) {
+                Long id,
+                String originalName,
+                Long fileSize,
+                DocumentStatus status,
+                LocalDateTime createdAt,
+                Long chatSessionId) {
 
 }

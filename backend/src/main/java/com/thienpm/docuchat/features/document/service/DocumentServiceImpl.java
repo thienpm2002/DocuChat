@@ -19,8 +19,6 @@ import com.thienpm.docuchat.features.user.entity.User;
 import com.thienpm.docuchat.features.user.repository.UserRepository;
 import com.thienpm.docuchat.storage.service.FileStorageService;
 
-import java.util.List;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -77,7 +75,8 @@ public class DocumentServiceImpl implements DocumentService {
                     originalName,
                     fileSize,
                     document.getStatus(),
-                    document.getCreatedAt());
+                    document.getCreatedAt(),
+                    null);
 
         } catch (Exception e) {
             try {
@@ -136,22 +135,6 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public DocumentResponse getDocumentById(Long documentId, Long userId) {
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
-
-        if (!userId.equals(document.getUser().getId()))
-            throw new AppException(ErrorCode.FORBIDDEN);
-
-        return new DocumentResponse(
-                documentId,
-                document.getOriginalName(),
-                document.getFileSize(),
-                document.getStatus(),
-                document.getCreatedAt());
-    }
-
-    @Override
     public Resource previewDocument(Long documentId, Long userId) {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
@@ -172,20 +155,10 @@ public class DocumentServiceImpl implements DocumentService {
 
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
 
-        Page<Document> page = documentRepository.findByUserId(userId, pageable);
-
-        List<DocumentResponse> data = page
-                .stream()
-                .map(document -> new DocumentResponse(
-                        document.getId(),
-                        document.getOriginalName(),
-                        document.getFileSize(),
-                        document.getStatus(),
-                        document.getCreatedAt()))
-                .toList();
+        Page<DocumentResponse> page = documentRepository.findDocumentsByUserId(userId, pageable);
 
         return PaginationResponse.<DocumentResponse>builder()
-                .data(data)
+                .data(page.getContent())
                 .page(page.getNumber())
                 .size(page.getSize())
                 .totalPages(page.getTotalPages())
