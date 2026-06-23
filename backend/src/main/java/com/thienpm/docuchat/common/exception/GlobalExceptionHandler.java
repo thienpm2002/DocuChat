@@ -3,6 +3,7 @@ package com.thienpm.docuchat.common.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -45,7 +46,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatus().value()).body(response);
     }
 
-    //
+    // Database
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDatabase(Exception ex) {
+
+        ErrorResponse response = ErrorResponse.of(ErrorCode.DATABASE_ERROR);
+
+        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus().value()).body(response);
+    }
+
+    // Server
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnknown(Exception ex) {
 

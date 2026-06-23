@@ -15,6 +15,7 @@ import useAuthStore from '../store/authStore';
 const AuthInitializer = ({children}) => {
 
   const setUser = useAuthStore(state => state.setUser);
+  const logout = useAuthStore(state => state.logout);
 
   useEffect(() => {
     const init = async () => {
@@ -26,6 +27,7 @@ const AuthInitializer = ({children}) => {
         setUser(data.user);
       } catch {
         setAccessToken(null);
+        logout();
       } 
     };
 
