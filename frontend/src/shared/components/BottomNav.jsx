@@ -1,7 +1,17 @@
 
-import { NavLink } from "react-router-dom"
+import { NavLink, useLocation, matchPath } from "react-router-dom"
 
 const BottomNav = ({ items = [] }) => {
+
+  const location = useLocation();
+
+  const isChatPage = matchPath(
+      "/chats/:id",
+      location.pathname
+  ); 
+
+  if (isChatPage) return null
+
   return (
     <nav
       className="

@@ -3,100 +3,16 @@ import MobileSearch from "@/shared/components/MobileSearch";
 import DocumentCard from "../components/DocumentCard";
 import AppPagination  from "@/shared/components/AppPagination";
 import LoadingScreen from "@/shared/components/LoadingScreen";
-import { useDocuments } from "../hooks";
+import { useDocuments, useDeleteDocument, useRetryProcessDocument } from "../hooks";
+import { useCreateChatSession } from "@/features/chat/hooks";
 
+import { documentApi } from "@/api/documentApi";
 
-const documents = {
-    data: [
-      {
-        id: 1,
-        fileSize: 2.4,
-        status: "PROCESSING",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
+import { toast } from "sonner"
 
-      {
-        id: 2,
-        fileSize: 2.4,
-        status: "READY",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-
-      {
-        id: 3,
-        fileSize: 2.4,
-        status: "FAILED",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-
-      {
-        id: 4,
-        fileSize: 2.4,
-        status: "PROCESSING",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-
-      {
-        id: 5,
-        fileSize: 2.4,
-        status: "PROCESSING",
-        originalName: "test.pdf" ,
-        uploadedAt: "2026-06-16 17:20:38"
-      },
-
-      {
-        id: 6,
-        fileSize: 2.4,
-        status: "FAILED",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-
-      {
-        id: 7,
-        fileSize: 2.4,
-        status: "FAILED",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-
-      {
-        id: 8,
-        fileSize: 2.4,
-        status: "FAILED",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-
-       {
-        id: 9,
-        fileSize: 2.4,
-        status: "FAILED",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-
-       {
-        id: 10,
-        fileSize: 2.4,
-        status: "FAILED",
-        originalName: "test.pdf",
-        uploadedAt: "2026-06-16 17:20:38" 
-      },
-      
-    ],
-    page: 0,
-    size: 3,
-    totalElements: 10,
-    totalPages: 4
- }
+import { useNavigate } from "react-router-dom";
 
 const DocumentPage = () => {
-
 
   const [params, setParams] = useSearchParams();
 
@@ -104,6 +20,50 @@ const DocumentPage = () => {
 
   const { data: pageData, isLoading} = useDocuments({page: page - 1,});
 
+  const deleteMutation = useDeleteDocument();
+  const retryMutation = useRetryProcessDocument();
+  const createMutation = useCreateChatSession();
+
+  const navigate = useNavigate();
+
+  const handlePreview = async (documentId) => {
+      try {
+        const response = await documentApi.preview(documentId);
+  
+        const url = URL.createObjectURL(response);
+  
+        window.open(url, "_blank");
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    const onDelete = async (documentId) => {
+      try {
+        await deleteMutation.mutateAsync(documentId)
+        toast.success("Delete success");
+      } catch (error) {
+        toast.error("Delete failed");
+      }
+    } 
+  
+    const onRetry = async (documentId) => {
+      try {
+        await retryMutation.mutateAsync(documentId)
+      } catch (error) {
+        toast.error("Retry failed");
+      }
+    } 
+  
+    const onChat = async (data) => {
+      try {
+        const chatSession = await createMutation.mutateAsync(data)
+        navigate(`/chats/${chatSession.id}`)
+      } catch (error) {
+        toast.error("Chat failed");
+      }
+    }
+  
   if(isLoading) return <LoadingScreen />
 
   return (
@@ -112,7 +72,18 @@ const DocumentPage = () => {
       <div className="p-6">
         <div>
           {
-            pageData?.data.map(document => <DocumentCard key={document.id} document={document}/>)
+            pageData?.data.map(document => 
+              <DocumentCard 
+                key={document.id} 
+                document={document} 
+                handlePreview={handlePreview}
+                onDelete={onDelete}
+                onRetry={onRetry}
+                onChat={onChat}
+                deletePending={deleteMutation.isPending}
+                retryPending={retryMutation.isPending}
+              />
+            )
           }
         </div>
         <div className='mt-8 flex justify-center gap-2'>

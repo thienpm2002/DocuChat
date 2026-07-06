@@ -1,7 +1,11 @@
+import {
+    useEffect,
+    useRef
+} from "react"
 
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
 
-import {FileText} from "lucide-react"
+import { FileText } from "lucide-react"
 
 import {
   Avatar,
@@ -20,14 +24,76 @@ import {
 import { toast } from "sonner"
 
 import { useLogout } from "@/features/auth/hooks";
-
 import useAuthStore from "@/features/auth/store/authStore"
+import { useChatSessionsInfinite, useDeleteChatSession, useUpdateChatSession } from "@/features/chat/hooks"
+
+import ChatList from "@/features/chat/components/ChatList"
+import LoadingScreen from "./LoadingScreen"
 
 const AppSidebar = ({ items = [] }) => {
 
-  const user = useAuthStore(state => state.user);
+  const containerRef = useRef(null)
+  const bottomRef = useRef(null)
 
+  const user = useAuthStore(state => state.user);
+  
   const logoutMutation = useLogout();
+
+  const {
+      data: pageData,
+      isPending,
+      fetchNextPage,
+      hasNextPage,
+      isFetchingNextPage
+  } = useChatSessionsInfinite();
+
+  const chats = pageData?.pages.flatMap(page => page.data) ?? [];
+
+  useEffect(() => {
+      if (!hasNextPage) return;
+
+      const observer = new IntersectionObserver(
+          ([entry]) => {
+              if (
+                  entry.isIntersecting &&
+                  !isFetchingNextPage
+              ) {
+                  fetchNextPage();
+              }
+          },
+          {
+              root: containerRef.current
+          }
+      );
+
+      if (!bottomRef.current) return;
+
+      observer.observe(bottomRef.current);
+
+      return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const deleteMutation = useDeleteChatSession();
+  const updateMutation = useUpdateChatSession();
+
+  const navigate = useNavigate();
+
+  const onDelete = async (chatSessionId) => {
+    try {
+      await deleteMutation.mutateAsync(chatSessionId);
+      navigate("/documents", { replace: true });
+    } catch (error) {
+      toast.error("Delete failed");
+    }
+  }
+
+  const onUpdate = async (data) => {
+    try {
+      await updateMutation.mutateAsync(data);
+    } catch (error) {
+      toast.error("Update failed");
+    }
+  }
 
   const logout = async () => {
     try {
@@ -77,13 +143,13 @@ const AppSidebar = ({ items = [] }) => {
         </span>
       </header>
 
-      <nav className="flex-1 py-4">
+      <nav className="py-4">
         <ul className="space-y-1">
           {items.map((item) => {
             const Icon = item.icon
 
             return (
-              <li key={item.to}>
+              <li key={item.to} className={item.to === '/chats' ? 'lg:hidden': ''}>
                 <NavLink
                   to={item.to}
                   className={({ isActive }) =>
@@ -120,6 +186,41 @@ const AppSidebar = ({ items = [] }) => {
           })}
         </ul>
       </nav>
+
+      {/* Chat list — hiện trên desktop */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        {/* Header */}
+        <div className="hidden lg:flex items-center justify-between px-3 py-2">
+          <span className="text-xs font-medium text-muted-foreground">Recents</span>
+        </div>
+
+        {/* List */}
+        <div className="hidden lg:block flex-1 overflow-y-auto" ref={containerRef}>
+          {
+            isPending ? 
+              <LoadingScreen /> 
+              :  
+              <>
+                <ChatList
+                    chats={chats}
+                    onDelete={onDelete}
+                    deletePending={deleteMutation.isPending}
+                    onUpdate={onUpdate}
+                    updatePending={updateMutation.isPending}
+                />
+
+                {/* Sentinel */}
+                <div ref={bottomRef} className="h-4" />
+
+                {isFetchingNextPage && (
+                    <div className="py-3 text-center text-sm text-muted-foreground">
+                        Loading...
+                    </div>
+                )}
+            </>
+          }
+        </div>
+      </div>
 
       <footer
         className="

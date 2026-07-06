@@ -12,11 +12,12 @@ import useAuthStore from '../store/authStore';
 //   }
 // }
 
-const AuthInitializer = ({children}) => {
+const AuthInitializer = ({ children }) => {
 
   const setUser = useAuthStore(state => state.setUser);
   const logout = useAuthStore(state => state.logout);
-
+  const setLoading = useAuthStore(state => state.setLoading);
+  
   useEffect(() => {
     const init = async () => {
       try {
@@ -28,7 +29,9 @@ const AuthInitializer = ({children}) => {
       } catch {
         setAccessToken(null);
         logout();
-      } 
+      } finally {
+        setLoading(false);
+      }
     };
 
     init();

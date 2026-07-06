@@ -17,6 +17,7 @@ import com.thienpm.docuchat.common.exception.ErrorCode;
 import com.thienpm.docuchat.common.util.ResponseWriter;
 import com.thienpm.docuchat.security.jwt.JwtAuthFilter;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -37,6 +38,7 @@ public class SecurityConfig {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(auth -> auth
+                                                .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                                                 .requestMatchers("/auth/login", "/auth/sign-up", "/auth/refresh")
                                                 .permitAll()
                                                 .anyRequest().authenticated())

@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
-import com.thienpm.docuchat.common.enums.DocumentStatus;
 import com.thienpm.docuchat.common.exception.AppException;
 import com.thienpm.docuchat.common.exception.ErrorCode;
 import com.thienpm.docuchat.features.document.entity.Document;
+import com.thienpm.docuchat.features.document.enums.DocumentStatus;
 import com.thienpm.docuchat.features.document.repository.DocumentRepository;
 import com.thienpm.docuchat.integration.ai.AiClient;
 import com.thienpm.docuchat.integration.ai.dto.request.DeleteDocumentRequest;

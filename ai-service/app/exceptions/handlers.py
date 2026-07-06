@@ -33,16 +33,10 @@ async def document_processing_handler(
         }
     )    
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 async def generic_handler(
     request: Request,
     exc: Exception
 ):
-
-    logger.exception(exc)
 
     return JSONResponse(
         status_code=500,

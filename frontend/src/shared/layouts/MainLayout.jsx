@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation, matchPath } from "react-router-dom"
 import BottomNav from "../components/BottomNav"
 import Header from "../components/Header"
 import AppSidebar from "../components/AppSidebar"
@@ -17,7 +17,7 @@ const items = [
     icon: Files,
   },
   {
-    to: "/chat",
+    to: "/chats",
     label: "Chats",
     icon: MessagesSquare,
   },
@@ -33,16 +33,33 @@ const items = [
   },
 ]
 
+const TITLES = {
+  "/": "Home",
+  "/documents": "Documents",
+  "/chats": "Chats",
+  "/settings": "Settings",
+};
+
 const MainLayout = () => {
+  const location = useLocation();
+  const pageTitle = TITLES[location.pathname] || "DocuChat";
+
+  const isChatPage = matchPath(
+    "/chats/:id",
+    location.pathname
+  );
+
   return (
       <div className="min-h-screen">
         <div className="flex">
           <AppSidebar items={items}/>
 
           <div className="flex-1 md:ml-16 lg:ml-65">
-            <Header />
+            {!isChatPage && (
+              <Header pageTitle={pageTitle} />
+            )}
 
-            <main className="pb-20 md:pb-0">
+            <main className={isChatPage? "" : "pb-20 md:pb-0"}>
               <Outlet />
             </main>
           </div>

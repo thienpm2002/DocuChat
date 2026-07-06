@@ -1,5 +1,6 @@
-from app.enums.status_enum import StatusEnum
 from app.schemas.request.process_document_request import ProcessDocumentRequest
+from app.schemas.request.chat_request import ChatRequest
+
 from app.rag.pipeline.rag_pipeline import RAGPipeline
 from pathlib import Path
 from app.core.config.settings import settings
@@ -22,3 +23,7 @@ def process_document(data: ProcessDocumentRequest, pipeline: RAGPipeline):
 
 def delete_document(document_id: int, pipeline: RAGPipeline):
     pipeline.delete_document(document_id)
+
+def chat_document(request: ChatRequest, pipeline: RAGPipeline):
+    return pipeline.ask_document(request)
+    

@@ -14,7 +14,7 @@ import { toast } from "sonner"
 
 const MAX_SIZE = 50 * 1024 * 1024;
 
-const Header = () => {
+const Header = ({ pageTitle }) => {
 
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState(null);
@@ -85,8 +85,8 @@ const Header = () => {
           top-0
           z-10
           h-14
-          border-b
-          border-border
+          md:border-b
+          md:border-border
           bg-background
           flex
           items-center
@@ -94,7 +94,7 @@ const Header = () => {
           px-8
         "
       >
-      <h2 className="font-bold text-[20px]">Documents</h2>
+      <h2 className="font-bold text-[20px]">{pageTitle}</h2>
       <HeaderSearch />
       <Button 
         onClick ={() =>setOpen(true)} 

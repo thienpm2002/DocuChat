@@ -1,4 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from app.exceptions.custom_exceptions import DocumentProcessingException
 
 def split_documents(documents):
 
@@ -7,4 +8,11 @@ def split_documents(documents):
         chunk_overlap=200
     )
 
-    return splitter.split_documents(documents)
+    chunks = splitter.split_documents(documents)
+
+    if not chunks:
+        raise DocumentProcessingException(
+            "No text chunks could be generated from this PDF."
+        )
+
+    return chunks

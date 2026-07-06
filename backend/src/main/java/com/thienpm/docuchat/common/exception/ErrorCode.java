@@ -26,10 +26,20 @@ public enum ErrorCode {
     FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "FILE_SIZE_EXCEEDED", "File size exceeds the maximum allowed limit"),
     FILE_STORAGE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_STORAGE_ERROR", "Failed to store file"),
     FILE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_DELETE_ERROR", "Failed to delete file"),
+
+    // Document
     DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "Document not found"),
     INVALID_DOCUMENT_STATUS(HttpStatus.CONFLICT, "INVALID_DOCUMENT_STATUS",
             "Document can only be retried when status is FAILED"),
+    DOCUMENT_NOT_READY(HttpStatus.CONFLICT, "DOCUMENT_NOT_READY",
+            "Document is not ready for chat"),
+    DOCUMENT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "DOCUMENT_ACCESS_DENIED",
+            "You don't have permission to access this document"),
 
+    // Chat
+    CHAT_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_SESSION_NOT_FOUND", "Chat session not found"),
+    CHAT_SESSION_ACCESS_DENIED(HttpStatus.FORBIDDEN, " CHAT_SESSION_ACCESS_DENIED",
+            "You don't have permission to access this chat session"),
     // Databse
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DATABASE_ERROR", "Database operation failed"),
 

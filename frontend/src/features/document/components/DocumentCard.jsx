@@ -21,12 +21,6 @@ import {
 
 import { Button } from "@/components/ui/button"
 
-import { toast } from "sonner"
-
-import { useDeleteDocument, useRetryProcessDocument } from "../hooks";
-
-import { documentApi } from "@/api/documentApi";
-
 const getStatusStyle = (status) => {
   switch (status) {
     case 'READY':      return 'bg-green-50 text-green-600'
@@ -65,48 +59,14 @@ const formatTime = (date) => {
 };  
 
 
-const DocumentCard = ({ document }) => {
+const DocumentCard = ({ document, handlePreview, onDelete, onRetry, onChat, deletePending, retryPending }) => {
 
   const documentId = document.id;
 
+  const data = {title: document.originalName, documentId};
+
   const isReady = document.status === 'READY'
   const isFailed = document.status === 'FAILED'
-
-  const deleteMutation = useDeleteDocument();
-  const retryMutation = useRetryProcessDocument();
-
-  const handlePreview = async () => {
-    try {
-      const response = await documentApi.preview(document.id);
-
-      const url = URL.createObjectURL(response);
-
-      window.open(url, "_blank");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const onDelete = async () => {
-    try {
-      await deleteMutation.mutateAsync(documentId)
-      toast.success("Delete success");
-    } catch (error) {
-      toast.error("Delete failed");
-    }
-  } 
-
-  const onRetry = async () => {
-    try {
-      await retryMutation.mutateAsync(documentId)
-    } catch (error) {
-      toast.error("Retry failed");
-    }
-  } 
-
-  const onChat = async () => {
-    console.log("chat")
-  }
 
   return (
     <div className="mb-4 bg-white border border-gray-100 rounded-xl px-3.5 py-3 flex items-center gap-3">
@@ -119,7 +79,7 @@ const DocumentCard = ({ document }) => {
       {/* Document information */}
       <div className="flex-1 min-w-0">
         <p
-          onClick={handlePreview}
+          onClick={() => handlePreview(documentId)}
           className="
             text-sm 
             font-medium 
@@ -153,7 +113,7 @@ const DocumentCard = ({ document }) => {
       <div className="hidden md:flex items-center gap-2">
         {isReady && (
           <Button 
-            onClick={onChat} 
+            onClick={() => onChat(data)} 
             variant="outline"
             className="
               w-8 
@@ -169,8 +129,8 @@ const DocumentCard = ({ document }) => {
 
         {isFailed && (
           <Button 
-            disabled={retryMutation.isPending} 
-            onClick={onRetry} 
+            disabled={retryPending} 
+            onClick={() => onRetry(documentId)} 
             variant="outline"
             className="
               w-8 
@@ -212,7 +172,7 @@ const DocumentCard = ({ document }) => {
 
             <AlertDialogFooter>
               <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
-              <AlertDialogAction disabled={deleteMutation.isPending} onClick={onDelete} >Continue</AlertDialogAction>
+              <AlertDialogAction disabled={deletePending} onClick={()=> onDelete(documentId)} >Continue</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -238,15 +198,15 @@ const DocumentCard = ({ document }) => {
 
           <DropdownMenuContent align="end">
             {isReady && (
-              <DropdownMenuItem onClick={onChat}>
+              <DropdownMenuItem onClick={() => onChat(data)}>
                 <MessageCircle className="w-4 h-4 mr-2" /> Chat
               </DropdownMenuItem>
             )}
 
             {isFailed && (
               <DropdownMenuItem 
-                disabled={retryMutation.isPending} 
-                onClick={onRetry}
+                disabled={retryPending} 
+                onClick={() => onRetry(documentId)}
               >
                 <RotateCcw className="w-4 h-4 mr-2" /> Retry
               </DropdownMenuItem>
@@ -274,7 +234,7 @@ const DocumentCard = ({ document }) => {
 
                   <AlertDialogFooter>
                     <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
-                    <AlertDialogAction disabled={deleteMutation.isPending} onClick={onDelete} >Continue</AlertDialogAction>
+                    <AlertDialogAction disabled={deletePending} onClick={() => onDelete(documentId)} >Continue</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>

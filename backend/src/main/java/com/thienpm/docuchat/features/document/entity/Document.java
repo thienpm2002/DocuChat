@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.thienpm.docuchat.common.enums.DocumentStatus;
+import com.thienpm.docuchat.features.document.enums.DocumentStatus;
 import com.thienpm.docuchat.features.user.entity.User;
 
 import jakarta.persistence.*;

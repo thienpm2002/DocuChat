@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 
 const MobileSearch = () => {
   return (
-    <div className="md:hidden border-b border-border py-2 px-8 flex justify-center">
+    <div className="md:hidden py-2 px-8 flex justify-center">
       <div className="relative w-full">
         <Search
           className="

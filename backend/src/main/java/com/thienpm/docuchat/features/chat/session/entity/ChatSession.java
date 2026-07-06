@@ -1,4 +1,4 @@
-package com.thienpm.docuchat.features.chat.entity;
+package com.thienpm.docuchat.features.chat.session.entity;
 
 import java.time.LocalDateTime;
 

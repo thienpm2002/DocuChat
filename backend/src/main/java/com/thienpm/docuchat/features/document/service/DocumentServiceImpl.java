@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thienpm.docuchat.common.enums.DocumentStatus;
 import com.thienpm.docuchat.common.exception.AppException;
 import com.thienpm.docuchat.common.exception.ErrorCode;
 import com.thienpm.docuchat.common.request.PaginationRequest;
@@ -12,6 +11,7 @@ import com.thienpm.docuchat.common.response.PaginationResponse;
 import com.thienpm.docuchat.features.document.dto.DocumentResponse;
 import com.thienpm.docuchat.features.document.dto.RetryDocumentResponse;
 import com.thienpm.docuchat.features.document.entity.Document;
+import com.thienpm.docuchat.features.document.enums.DocumentStatus;
 import com.thienpm.docuchat.features.document.event.DocumentCreatedEvent;
 import com.thienpm.docuchat.features.document.event.DocumentDeletedEvent;
 import com.thienpm.docuchat.features.document.repository.DocumentRepository;
@@ -96,7 +96,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
 
         if (!userId.equals(document.getUser().getId()))
-            throw new AppException(ErrorCode.FORBIDDEN);
+            throw new AppException(ErrorCode.DOCUMENT_ACCESS_DENIED);
 
         String storedName = document.getStoredName();
 
@@ -113,7 +113,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
 
         if (!userId.equals(document.getUser().getId()))
-            throw new AppException(ErrorCode.FORBIDDEN);
+            throw new AppException(ErrorCode.DOCUMENT_ACCESS_DENIED);
 
         if (document.getStatus() != DocumentStatus.FAILED) {
             throw new AppException(ErrorCode.INVALID_DOCUMENT_STATUS);
@@ -140,7 +140,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
 
         if (!userId.equals(document.getUser().getId())) {
-            throw new AppException(ErrorCode.FORBIDDEN);
+            throw new AppException(ErrorCode.DOCUMENT_ACCESS_DENIED);
         }
 
         return fileStorageService.loadAsResource(
