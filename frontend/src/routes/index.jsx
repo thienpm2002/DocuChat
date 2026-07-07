@@ -3,7 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { authRoutes } from "./auth.routes.jsx";
 import { doucmentRoutes } from "./document.routes.jsx";
 import { chatRoutes } from "./chat.routes.jsx";
-
+import { userRoutes } from "./user.routes.jsx";
 import NotFoundPage from "@/shared/pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -13,6 +13,8 @@ export const router = createBrowserRouter([
   doucmentRoutes,
 
   chatRoutes,
+
+  userRoutes,
 
   {
     path: "*",

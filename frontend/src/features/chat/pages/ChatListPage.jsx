@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MobileSearch from "@/shared/components/MobileSearch"
 import AppPagination from "@/shared/components/AppPagination";

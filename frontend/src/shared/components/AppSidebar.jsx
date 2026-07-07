@@ -30,6 +30,8 @@ import { useChatSessionsInfinite, useDeleteChatSession, useUpdateChatSession } f
 import ChatList from "@/features/chat/components/ChatList"
 import LoadingScreen from "./LoadingScreen"
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AppSidebar = ({ items = [] }) => {
 
   const containerRef = useRef(null)
@@ -243,7 +245,7 @@ const AppSidebar = ({ items = [] }) => {
               className="flex items-center gap-3 cursor-pointer outline-none"
             >
               <Avatar className="size-8">
-                <AvatarImage src={user?.avatarUrl ? `${VITE_API_URL}${user.avatarUrl}` :`https://api.dicebear.com/9.x/initials/svg?seed=${user?.userName}`} />
+                <AvatarImage src={user?.avatarUrl ? `${API_URL}${user.avatarUrl}` :`https://api.dicebear.com/9.x/initials/svg?seed=${user?.userName}`} />
                 <AvatarFallback>TP</AvatarFallback>
               </Avatar>
 

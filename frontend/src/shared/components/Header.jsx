@@ -1,4 +1,5 @@
 import { useState, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import { Plus, Upload } from "lucide-react"
 import HeaderSearch from "./HeaderSearch"
 import { Button } from "@/components/ui/button"
@@ -22,6 +23,8 @@ const Header = ({ pageTitle }) => {
 
   const fileInputRef = useRef(null);
   const controllerRef = useRef(null);
+
+  const navigate = useNavigate();
 
   const { mutateAsync, isPending } = useUploadDocument();
 
@@ -65,6 +68,7 @@ const Header = ({ pageTitle }) => {
       }
 
       setOpen(false)
+      navigate("/documents")
       toast.success("Upload success");
     } catch (error) {
       toast.error("Upload failed");
