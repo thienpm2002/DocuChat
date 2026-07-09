@@ -24,4 +24,6 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> 
     Page<ChatSessionResponse> findChatSessionsByUserId(Long userId, Pageable pageable);
 
     Optional<ChatSession> findByDocument(Document document);
+
+    Long countByUserId(Long userId);
 }

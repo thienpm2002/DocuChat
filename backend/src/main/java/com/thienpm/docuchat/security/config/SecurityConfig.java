@@ -39,7 +39,8 @@ public class SecurityConfig {
 
                                 .authorizeHttpRequests(auth -> auth
                                                 .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
-                                                .requestMatchers("/auth/login", "/auth/sign-up", "/auth/refresh")
+                                                .requestMatchers("/auth/login", "/auth/sign-up", "/auth/refresh",
+                                                                "/storage/avatars/**")
                                                 .permitAll()
                                                 .anyRequest().authenticated())
 

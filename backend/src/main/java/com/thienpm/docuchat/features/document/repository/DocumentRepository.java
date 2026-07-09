@@ -24,4 +24,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             WHERE d.user.id = :userId
             """)
     Page<DocumentResponse> findDocumentsByUserId(Long userId, Pageable pageable);
+
+    Long countByUserId(Long userId);
 }

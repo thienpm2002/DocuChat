@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thienpm.docuchat.features.auth.dto.request.LoginRequest;
 import com.thienpm.docuchat.features.auth.dto.request.SignUpRequest;
 import com.thienpm.docuchat.features.auth.dto.response.AuthResponse;
+import com.thienpm.docuchat.features.auth.dto.response.RefreshTokenResponse;
 import com.thienpm.docuchat.features.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -57,7 +58,7 @@ public class AuthController {
 
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-                AuthResponse authResponse = authService.generateTokens(userDetails);
+                AuthResponse authResponse = authService.login(userDetails);
 
                 ResponseCookie refreshCookie = setCookie(authResponse.refreshToken());
 
@@ -81,15 +82,13 @@ public class AuthController {
         @PostMapping("/refresh")
         public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
 
-                AuthResponse authResponse = authService.refresh(refreshToken);
+                RefreshTokenResponse refreshResponse = authService.refresh(refreshToken);
 
-                ResponseCookie refreshCookie = setCookie(authResponse.refreshToken());
+                ResponseCookie refreshCookie = setCookie(refreshResponse.refreshToken());
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                                .body(Map.of(
-                                                "accessToken", authResponse.accessToken(),
-                                                "user", authResponse.userDetailsResponse()));
+                                .body(Map.of("accessToken", refreshResponse.accessToken()));
         }
 
         private ResponseCookie setCookie(String refreshToken) {

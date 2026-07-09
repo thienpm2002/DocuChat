@@ -29,6 +29,7 @@ public enum ErrorCode {
 
     // Document
     DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "DOCUMENT_NOT_FOUND", "Document not found"),
+    STORAGE_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORAGE_FILE_NOT_FOUND", "File not found in storage"),
     INVALID_DOCUMENT_STATUS(HttpStatus.CONFLICT, "INVALID_DOCUMENT_STATUS",
             "Document can only be retried when status is FAILED"),
     DOCUMENT_NOT_READY(HttpStatus.CONFLICT, "DOCUMENT_NOT_READY",

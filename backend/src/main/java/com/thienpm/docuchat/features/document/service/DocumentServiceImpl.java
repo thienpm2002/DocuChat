@@ -17,6 +17,7 @@ import com.thienpm.docuchat.features.document.event.DocumentDeletedEvent;
 import com.thienpm.docuchat.features.document.repository.DocumentRepository;
 import com.thienpm.docuchat.features.user.entity.User;
 import com.thienpm.docuchat.features.user.repository.UserRepository;
+import com.thienpm.docuchat.storage.enums.StorageType;
 import com.thienpm.docuchat.storage.service.FileStorageService;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,7 +43,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        String storedName = fileStorageService.store(file);
+        String storedName = fileStorageService.store(file, StorageType.DOCUMENT);
 
         Long fileSize = file.getSize();
         String originalName = file.getOriginalFilename();
@@ -80,7 +81,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         } catch (Exception e) {
             try {
-                fileStorageService.delete(storedName);
+                fileStorageService.delete(storedName, StorageType.DOCUMENT);
             } catch (Exception ignored) {
 
             }
@@ -144,7 +145,7 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         return fileStorageService.loadAsResource(
-                document.getStoredName());
+                document.getStoredName(), StorageType.DOCUMENT);
     }
 
     @Override

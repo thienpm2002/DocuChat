@@ -8,6 +8,7 @@ import com.thienpm.docuchat.common.exception.AppException;
 import com.thienpm.docuchat.common.exception.ErrorCode;
 import com.thienpm.docuchat.features.auth.dto.request.SignUpRequest;
 import com.thienpm.docuchat.features.auth.dto.response.AuthResponse;
+import com.thienpm.docuchat.features.auth.dto.response.RefreshTokenResponse;
 import com.thienpm.docuchat.features.user.dto.response.UserDetailsResponse;
 import com.thienpm.docuchat.features.user.entity.User;
 import com.thienpm.docuchat.features.user.enums.Role;
@@ -36,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
         User newUser = User.builder()
                 .email(signUpRequest.email())
                 .password(passwordEncoder.encode(signUpRequest.password()))
-                .username(signUpRequest.userName())
+                .userName(signUpRequest.userName())
                 .role(Role.USER)
                 .build();
 
@@ -51,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
 
                 new UserDetailsResponse(
                         newUser.getId(),
-                        newUser.getUsername(),
+                        newUser.getUserName(),
                         newUser.getEmail(),
                         newUser.getAvatarUrl(),
                         newUser.getRole()));
@@ -59,8 +60,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse generateTokens(UserDetails userDetails) {
+    public AuthResponse login(UserDetails userDetails) {
         User user = ((CustomUserDetails) userDetails).getUser();
+
+        String avatarUrl = null;
+        if (user.getAvatarUrl() != null) {
+            avatarUrl = "/storage/avatars/" + user.getAvatarUrl();
+        }
 
         return AuthResponse.of(
                 jwtService.generateAccessToken(userDetails),
@@ -69,14 +75,14 @@ public class AuthServiceImpl implements AuthService {
 
                 new UserDetailsResponse(
                         user.getId(),
-                        user.getUsername(),
+                        user.getUserName(),
                         user.getEmail(),
-                        user.getAvatarUrl(),
+                        avatarUrl,
                         user.getRole()));
     }
 
     @Override
-    public AuthResponse refresh(String refreshToken) {
+    public RefreshTokenResponse refresh(String refreshToken) {
         if (refreshToken == null)
             throw new AppException(ErrorCode.UNAUTHORIZED);
 
@@ -87,7 +93,10 @@ public class AuthServiceImpl implements AuthService {
 
             UserDetails userDetails = new CustomUserDetails(user);
 
-            return generateTokens(userDetails);
+            return RefreshTokenResponse.of(
+                    jwtService.generateAccessToken(userDetails),
+
+                    jwtService.generateRefreshToken(userDetails));
         } catch (ExpiredJwtException e) {
             throw new AppException(ErrorCode.TOKEN_EXPIRED);
         } catch (JwtException e) {

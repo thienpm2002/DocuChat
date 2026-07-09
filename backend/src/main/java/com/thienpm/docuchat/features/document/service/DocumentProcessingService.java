@@ -13,6 +13,7 @@ import com.thienpm.docuchat.features.document.repository.DocumentRepository;
 import com.thienpm.docuchat.integration.ai.AiClient;
 import com.thienpm.docuchat.integration.ai.dto.request.DeleteDocumentRequest;
 import com.thienpm.docuchat.integration.ai.dto.request.ProcessDocumentRequest;
+import com.thienpm.docuchat.storage.enums.StorageType;
 import com.thienpm.docuchat.storage.service.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
@@ -63,7 +64,7 @@ public class DocumentProcessingService {
 
         deleteChunks(request.documentId());
 
-        fileStorageService.delete(request.storedName());
+        fileStorageService.delete(request.storedName(), StorageType.DOCUMENT);
     }
 
 }
