@@ -17,7 +17,9 @@ import com.thienpm.docuchat.storage.enums.StorageType;
 import com.thienpm.docuchat.storage.service.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentProcessingService {
@@ -29,33 +31,53 @@ public class DocumentProcessingService {
 
         try {
             aiClient.deleteDocument(documentId);
-        } catch (Exception ignored) {
+            log.info("Vector cleanup completed: documentId={}", documentId);
+        } catch (Exception ex) {
+            log.warn("Failed to delete existing chunks: documentId={}", documentId);
         }
     }
 
     @Async
     public void processAsync(ProcessDocumentRequest request) {
+        long start = System.nanoTime();
+        log.info("Start processing document: documentId={}", request.documentId());
+
         Document document = documentRepository.findById(request.documentId())
                 .orElseThrow(() -> new AppException(ErrorCode.DOCUMENT_NOT_FOUND));
 
         deleteChunks(request.documentId());
 
         try {
+            log.info("Sending document to AI service: documentId={}", request.documentId());
             aiClient.processDocument(request);
+            log.info("AI service completed: documentId={}", request.documentId());
 
             document.setStatus(DocumentStatus.READY);
             document.setErrorMessage(null);
 
         } catch (HttpClientErrorException | HttpServerErrorException ex) {
+            log.error("AI service returned an error for documentId={}", request.documentId(), ex);
             document.setStatus(DocumentStatus.FAILED);
             document.setErrorMessage(ex.getResponseBodyAsString());
 
         } catch (Exception e) {
+            log.error("Unexpected error while processing documentId={}", request.documentId(), e);
             document.setStatus(DocumentStatus.FAILED);
             document.setErrorMessage("Unexpected error");
         }
 
         documentRepository.save(document);
+        log.info(
+                "Document status updated: documentId={}, status={}",
+                request.documentId(),
+                document.getStatus());
+
+        long duration = (System.nanoTime() - start) / 1_000_000;
+
+        log.info(
+                "Document processing finished: documentId={}, duration={} ms",
+                request.documentId(),
+                duration);
 
     }
 

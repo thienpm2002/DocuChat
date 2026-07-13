@@ -10,6 +10,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,6 +24,8 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors()
                 .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
+        log.warn("Validation failed: {}", errors);
+
         ErrorResponse response = ErrorResponse.of(ErrorCode.VALIDATION_ERROR, errors);
 
         return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatus().value()).body(response);
@@ -29,6 +34,8 @@ public class GlobalExceptionHandler {
     // Login fail
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuth(AuthenticationException ex) {
+
+        log.warn("Authentication failed");
 
         ErrorResponse response = ErrorResponse.of(ErrorCode.BAD_CREDENTIALS);
 
@@ -39,6 +46,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponse> handleAppException(AppException ex) {
 
+        log.warn("Business exception: {}", ex.getErrorCode());
+
         ErrorCode errorCode = ex.getErrorCode();
 
         ErrorResponse response = ErrorResponse.of(errorCode);
@@ -48,7 +57,9 @@ public class GlobalExceptionHandler {
 
     // Database
     @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ErrorResponse> handleDatabase(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleDatabase(DataAccessException ex) {
+
+        log.error("Database error occurred", ex);
 
         ErrorResponse response = ErrorResponse.of(ErrorCode.DATABASE_ERROR);
 
@@ -58,6 +69,8 @@ public class GlobalExceptionHandler {
     // Server
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnknown(Exception ex) {
+
+        log.error("Unexpected error occurred", ex);
 
         ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR);
 

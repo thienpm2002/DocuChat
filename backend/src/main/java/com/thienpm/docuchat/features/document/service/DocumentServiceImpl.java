@@ -28,7 +28,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
@@ -70,6 +72,8 @@ public class DocumentServiceImpl implements DocumentService {
                             storedName,
                             originalName));
 
+            log.info("Document uploaded successfully: documentId={}, userId={}",
+                    documentId, userId);
             // Response client
             return new DocumentResponse(
                     documentId,
@@ -105,6 +109,9 @@ public class DocumentServiceImpl implements DocumentService {
 
         eventPublisher.publishEvent(new DocumentDeletedEvent(documentId, storedName));
 
+        log.info("Delete document successfully: documentId={}, userId={}",
+                documentId, userId);
+
     }
 
     @Transactional
@@ -129,6 +136,11 @@ public class DocumentServiceImpl implements DocumentService {
                         documentId,
                         document.getStoredName(),
                         document.getOriginalName()));
+
+        log.info(
+                "Document retry requested: documentId={}, userId={}",
+                documentId,
+                userId);
 
         return new RetryDocumentResponse(
                 documentId,

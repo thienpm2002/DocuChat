@@ -19,7 +19,9 @@ import com.thienpm.docuchat.security.jwt.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -44,6 +46,8 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(newUser);
 
         UserDetails userDetails = new CustomUserDetails(newUser);
+
+        log.info("User registered successfully: userId={}", newUser.getId());
 
         return AuthResponse.of(
                 jwtService.generateAccessToken(userDetails),

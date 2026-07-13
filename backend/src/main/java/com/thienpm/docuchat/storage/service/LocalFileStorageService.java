@@ -22,7 +22,9 @@ import com.thienpm.docuchat.storage.validator.FileValidator;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LocalFileStorageService implements FileStorageService {
@@ -49,6 +51,9 @@ public class LocalFileStorageService implements FileStorageService {
             Path target = getRootLocation(type).resolve(storedName);
             Files.copy(file.getInputStream(), target);
 
+            log.info("File stored successfully: storedName={}, type={}",
+                    storedName, type);
+
             return storedName;
         } catch (IOException e) {
             // Lỗi UUID trùng
@@ -61,6 +66,7 @@ public class LocalFileStorageService implements FileStorageService {
         try {
             Path file = getRootLocation(type).resolve(storedName);
             Files.deleteIfExists(file);
+            log.info("File deleted: storedName={}, type={}", storedName, type);
         } catch (IOException e) {
             throw new AppException(ErrorCode.FILE_DELETE_ERROR);
         }

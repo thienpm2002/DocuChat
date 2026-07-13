@@ -126,16 +126,31 @@ public class MessageServiceImpl implements MessageService {
 
                 messageRepository.save(assistantMessage);
 
+                log.info(
+                                "Chat request started: sessionId={}, documentId={}, userMessageId={}, assistantMessageId={}",
+                                chatSessionId,
+                                session.getDocument().getId(),
+                                userMessage.getId(),
+                                assistantMessage.getId());
+
                 // B4. SSE
                 SseEmitter emitter = new SseEmitter(180_000L);
                 StringBuilder fullContent = new StringBuilder();
 
                 emitter.onTimeout(() -> {
+                        log.warn(
+                                        "Chat request timeout: sessionId={}",
+                                        chatSessionId);
                         saveAssistantMessage(assistantMessage, fullContent);
                         emitter.complete();
                 });
 
                 emitter.onError(ex -> {
+                        log.error(
+                                        "SSE connection error: sessionId={}",
+                                        chatSessionId,
+                                        ex);
+
                         saveAssistantMessage(assistantMessage, fullContent);
                 });
 
@@ -148,6 +163,11 @@ public class MessageServiceImpl implements MessageService {
                                                 request.content());
 
                                 final String[] currentEvent = { null };
+
+                                log.info(
+                                                "Sending chat request to AI service: sessionId={}, documentId={}",
+                                                chatSessionId,
+                                                session.getDocument().getId());
 
                                 aiClient.streamChat(aiRequest, line -> {
 
@@ -206,6 +226,12 @@ public class MessageServiceImpl implements MessageService {
 
                                                                 saveAssistantMessage(assistantMessage, fullContent);
 
+                                                                log.info(
+                                                                                "Chat response completed: sessionId={}, assistantMessageId={}, responseLength={}",
+                                                                                chatSessionId,
+                                                                                assistantMessage.getId(),
+                                                                                fullContent.length());
+
                                                                 emitter.send(SseEmitter.event()
                                                                                 .name("done")
                                                                                 .data("{}"));
@@ -216,6 +242,11 @@ public class MessageServiceImpl implements MessageService {
                                                         case "error" -> {
 
                                                                 saveAssistantMessage(assistantMessage, fullContent);
+
+                                                                log.error(
+                                                                                "AI returned chat error: sessionId={}, documentId={}",
+                                                                                chatSessionId,
+                                                                                session.getDocument().getId());
 
                                                                 emitter.send(SseEmitter.event()
                                                                                 .name("error")
@@ -233,6 +264,11 @@ public class MessageServiceImpl implements MessageService {
                                 });
 
                         } catch (Exception ex) {
+
+                                log.error(
+                                                "Unexpected error while processing chat: sessionId={}",
+                                                chatSessionId,
+                                                ex);
 
                                 try {
                                         saveAssistantMessage(assistantMessage, fullContent);
