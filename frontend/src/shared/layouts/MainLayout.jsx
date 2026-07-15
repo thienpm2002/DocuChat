@@ -2,6 +2,7 @@ import { Outlet, useLocation, matchPath } from "react-router-dom"
 import BottomNav from "../components/BottomNav"
 import Header from "../components/Header"
 import AppSidebar from "../components/AppSidebar"
+import SearchDialog from "@/features/search/components/SearchDialog"
 
 import {
   Files,
@@ -66,6 +67,8 @@ const MainLayout = () => {
         </div>
 
         <BottomNav items={items}/>
+
+        <SearchDialog />
       </div>
   )
 }

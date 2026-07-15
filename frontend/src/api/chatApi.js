@@ -6,7 +6,7 @@ export const chatApi = {
 
     remove: (chatSessionId) => privateClient.delete(`/chat-sessions/${chatSessionId}`),
 
-    list: (params) => privateClient.get("/chat-sessions", { params }),
+    list: ({ signal, ...params }) => privateClient.get("/chat-sessions", { params, signal }),
     
     details: (chatSessionId) => privateClient.get(`/chat-sessions/${chatSessionId}`),
 

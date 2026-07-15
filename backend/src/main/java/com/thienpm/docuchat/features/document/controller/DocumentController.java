@@ -57,10 +57,10 @@ public class DocumentController {
     }
 
     @GetMapping
-    public ResponseEntity<PaginationResponse<DocumentResponse>> getAllDocuments(
+    public ResponseEntity<PaginationResponse<DocumentResponse>> getDocuments(
             @Valid @ModelAttribute PaginationRequest request,
             @AuthenticationPrincipal Long userId) {
-        return ResponseEntity.ok().body(documentService.getAllDocuments(request, userId));
+        return ResponseEntity.ok().body(documentService.getDocuments(request, userId));
     }
 
     @PostMapping("/{id}/retry")

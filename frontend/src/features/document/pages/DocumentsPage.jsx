@@ -56,11 +56,19 @@ const DocumentPage = () => {
     } 
   
     const onChat = async (data) => {
+
+      const {chatSessionId, ...createChatSessionRequest} = data;
+
+      if(data.chatSessionId){
+        navigate(`/chats/${chatSessionId}`)
+        return;
+      }
+
       try {
-        const chatSession = await createMutation.mutateAsync(data)
+        const chatSession = await createMutation.mutateAsync(createChatSessionRequest)
         navigate(`/chats/${chatSession.id}`)
       } catch (error) {
-        toast.error("Chat failed");
+        toast.error("Failed to open chat.");
       }
     }
   

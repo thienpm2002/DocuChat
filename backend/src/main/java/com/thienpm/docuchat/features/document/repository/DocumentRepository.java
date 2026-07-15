@@ -26,4 +26,20 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     Page<DocumentResponse> findDocumentsByUserId(Long userId, Pageable pageable);
 
     Long countByUserId(Long userId);
+
+    @Query("""
+            SELECT new com.thienpm.docuchat.features.document.dto.DocumentResponse(
+                d.id,
+                d.originalName,
+                d.fileSize,
+                d.status,
+                d.createdAt,
+                cs.id
+            )
+            FROM Document d
+            LEFT JOIN ChatSession cs ON cs.document = d
+            WHERE d.user.id = :userId
+              AND LOWER(d.originalName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            """)
+    Page<DocumentResponse> searchByUserIdAndKeyword(String keyword, Long userId, Pageable pageable);
 }

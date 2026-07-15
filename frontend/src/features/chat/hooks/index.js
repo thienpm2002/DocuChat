@@ -13,3 +13,5 @@ export * from "./useChatSessionsInfinite"
 export * from "./useMessages"
 
 export * from "./useChatStream"
+
+export * from "./useSearchChatSessionsInfinite"

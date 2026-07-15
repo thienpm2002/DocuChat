@@ -1,9 +1,13 @@
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import useSearchStore from "@/features/search/store/useSearchStore"
 
 const HeaderSearch = () => {
+
+  const setOpen = useSearchStore(state => state.setOpen);
+
   return (
-    <div className="hidden py-2 px-8 md:flex justify-center">
+    <div onClick={() => setOpen(true)} className="hidden py-2 px-8 md:flex justify-center">
       <div className="relative md:w-80 lg:w-105">
         <Search
           className="
@@ -17,8 +21,9 @@ const HeaderSearch = () => {
         />
 
         <Input
+          readOnly
           className="pl-10"
-          placeholder="Type to search..."
+          placeholder="Search..."
         />
       </div>
     </div>

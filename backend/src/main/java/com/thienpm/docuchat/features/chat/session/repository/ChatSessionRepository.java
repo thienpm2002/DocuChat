@@ -26,4 +26,16 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> 
     Optional<ChatSession> findByDocument(Document document);
 
     Long countByUserId(Long userId);
+
+    @Query("""
+            SELECT new com.thienpm.docuchat.features.chat.session.dto.response.ChatSessionResponse(
+                cs.id,
+                cs.title,
+                cs.document.id
+            )
+            FROM ChatSession cs
+            WHERE cs.user.id = :userId
+              AND LOWER(cs.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            """)
+    Page<ChatSessionResponse> searchByUserIdAndKeyword(String keyword, Long userId, Pageable pageable);
 }

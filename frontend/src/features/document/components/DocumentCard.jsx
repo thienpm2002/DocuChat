@@ -23,10 +23,10 @@ import { Button } from "@/components/ui/button"
 
 const getStatusStyle = (status) => {
   switch (status) {
-    case 'READY':      return 'bg-green-50 text-green-600'
-    case 'PROCESSING': return 'bg-blue-50 text-blue-500'
+    case 'READY':      return 'bg-green-50 text-emerald-600 dark:text-emerald-400'
+    case 'PROCESSING': return 'bg-blue-50 text-sky-600 dark:text-sky-400'
     case 'FAILED':     return 'bg-red-50 text-red-500'
-    default:           return 'bg-gray-100 text-gray-500'
+    default:           return 'bg-gray-100 text-red-600 dark:text-red-400'
   }
 }
 
@@ -63,7 +63,7 @@ const DocumentCard = ({ document, handlePreview, onDelete, onRetry, onChat, dele
 
   const documentId = document.id;
 
-  const data = {title: document.originalName, documentId};
+  const data = {title: document.originalName, documentId, chatSessionId: document.chatSessionId};
 
   const isReady = document.status === 'READY'
   const isFailed = document.status === 'FAILED'

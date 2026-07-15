@@ -1,9 +1,13 @@
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import useSearchStore from "@/features/search/store/useSearchStore"
 
 const MobileSearch = () => {
+
+  const setOpen = useSearchStore(state => state.setOpen);
+
   return (
-    <div className="md:hidden py-2 px-8 flex justify-center">
+    <div onClick={() => setOpen(true)} className="md:hidden py-2 px-8 flex justify-center">
       <div className="relative w-full">
         <Search
           className="
@@ -17,8 +21,9 @@ const MobileSearch = () => {
         />
 
         <Input
+          readOnly
           className="pl-10"
-          placeholder="Type to search..."
+          placeholder="Search..."
         />
       </div>
     </div>

@@ -55,10 +55,10 @@ public class ChatSessionController {
     }
 
     @GetMapping
-    public ResponseEntity<PaginationResponse<ChatSessionResponse>> getAllChatSessions(
+    public ResponseEntity<PaginationResponse<ChatSessionResponse>> getChatSessions(
             @Valid @ModelAttribute PaginationRequest request,
             @AuthenticationPrincipal Long userId) {
-        return ResponseEntity.ok().body(chatSessionService.getAllSessions(request, userId));
+        return ResponseEntity.ok().body(chatSessionService.getChatSessions(request, userId));
     }
 
     @DeleteMapping("/{id}")

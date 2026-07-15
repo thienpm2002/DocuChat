@@ -1,11 +1,13 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { chatApi } from "@/api/chatApi"
 
-export const useChatSessionsInfinite = () => {
+export const useSearchChatSessionsInfinite = (keyword, enabled) => {
     return useInfiniteQuery({
-        queryKey: ['chats'],
+        queryKey: ['chats', keyword],
 
-        queryFn: ({ pageParam = 0, signal }) => chatApi.list({ page: pageParam, size: 10, signal }),
+        queryFn: ({ pageParam = 0, signal }) => chatApi.list({ keyword, page: pageParam, size: 10, signal }),
+
+        enabled: keyword.trim().length > 0 && enabled,
 
         initialPageParam: 0,
 

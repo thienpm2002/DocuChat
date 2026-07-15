@@ -13,7 +13,7 @@ public interface ChatSessionService {
 
     ChatSessionResponse updateSession(Long userId, Long chatSessionId, UpdateChatSessionRequest request);
 
-    PaginationResponse<ChatSessionResponse> getAllSessions(PaginationRequest request, Long userId);
+    PaginationResponse<ChatSessionResponse> getChatSessions(PaginationRequest request, Long userId);
 
     void deleteChatSession(Long userId, Long chatSessionId);
 }

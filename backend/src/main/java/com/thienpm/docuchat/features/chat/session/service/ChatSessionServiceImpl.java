@@ -98,14 +98,23 @@ public class ChatSessionServiceImpl implements ChatSessionService {
     }
 
     @Override
-    public PaginationResponse<ChatSessionResponse> getAllSessions(PaginationRequest request, Long userId) {
+    public PaginationResponse<ChatSessionResponse> getChatSessions(PaginationRequest request, Long userId) {
         Sort sort = Sort.by(
                 Sort.Direction.fromString(request.getSortDirection().name()),
                 request.getSortBy().getField());
 
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
 
-        Page<ChatSessionResponse> page = chatSessionRepository.findChatSessionsByUserId(userId, pageable);
+        Page<ChatSessionResponse> page;
+
+        if (request.getKeyword() == null || request.getKeyword().isBlank()) {
+            page = chatSessionRepository.findChatSessionsByUserId(userId, pageable);
+        } else {
+            page = chatSessionRepository.searchByUserIdAndKeyword(
+                    request.getKeyword().trim(),
+                    userId,
+                    pageable);
+        }
 
         return PaginationResponse.<ChatSessionResponse>builder()
                 .data(page.getContent())

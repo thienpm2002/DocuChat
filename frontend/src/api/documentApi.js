@@ -5,7 +5,7 @@ export const documentApi = {
 
     remove: (documentId) => privateClient.delete(`/documents/${documentId}`),
 
-    list: (params) => privateClient.get("/documents", { params }),
+    list: ({ signal, ...params }) => privateClient.get("/documents", { params, signal }),
 
     preview: (documentId) => privateClient.get(`/documents/${documentId}/preview`, {
         responseType: "blob",

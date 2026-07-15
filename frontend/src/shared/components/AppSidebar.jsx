@@ -1,9 +1,7 @@
-import {
-    useEffect,
-    useRef
-} from "react"
+import { useEffect } from "react"
 
 import { NavLink, useNavigate } from "react-router-dom"
+import { useInView } from "react-intersection-observer"
 
 import { FileText } from "lucide-react"
 
@@ -34,9 +32,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const AppSidebar = ({ items = [] }) => {
 
-  const containerRef = useRef(null)
-  const bottomRef = useRef(null)
-
   const user = useAuthStore(state => state.user);
   
   const logoutMutation = useLogout();
@@ -51,29 +46,16 @@ const AppSidebar = ({ items = [] }) => {
 
   const chats = pageData?.pages.flatMap(page => page.data) ?? [];
 
+  const { ref: bottomRef, inView } = useInView({
+    threshold: 0,
+    skip: !hasNextPage,
+  });
+
   useEffect(() => {
-      if (!hasNextPage) return;
-
-      const observer = new IntersectionObserver(
-          ([entry]) => {
-              if (
-                  entry.isIntersecting &&
-                  !isFetchingNextPage
-              ) {
-                  fetchNextPage();
-              }
-          },
-          {
-              root: containerRef.current
-          }
-      );
-
-      if (!bottomRef.current) return;
-
-      observer.observe(bottomRef.current);
-
-      return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const deleteMutation = useDeleteChatSession();
   const updateMutation = useUpdateChatSession();
@@ -197,7 +179,7 @@ const AppSidebar = ({ items = [] }) => {
         </div>
 
         {/* List */}
-        <div className="hidden lg:block flex-1 overflow-y-auto" ref={containerRef}>
+        <div className="hidden lg:block flex-1 overflow-y-auto">
           {
             isPending ? 
               <LoadingScreen /> 
@@ -212,7 +194,7 @@ const AppSidebar = ({ items = [] }) => {
                 />
 
                 {/* Sentinel */}
-                <div ref={bottomRef} className="h-4" />
+                {hasNextPage && <div ref={bottomRef} className="h-4" />}
 
                 {isFetchingNextPage && (
                     <div className="py-3 text-center text-sm text-muted-foreground">
